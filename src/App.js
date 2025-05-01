@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { API, graphqlOperation } from 'aws-amplify';
+import { generateClient } from 'aws-amplify/api';
 import { listTodos } from './graphql/queries'; // 假設你有一個 listTodos
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const client = generateClient();
 
   useEffect(() => {
     async function fetchTodos() {
       try {
-        const result = await API.graphql(graphqlOperation(listTodos));
+        const result = await client.graphql({
+          query: listTodos
+        });
         setTodos(result.data.listTodos.items);
       } catch (err) {
         console.error('Error fetching todos', err);
