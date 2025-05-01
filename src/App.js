@@ -1,14 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { API, graphqlOperation } from 'aws-amplify';
+import { listTodos } from './graphql/queries'; // 假設你有一個 listTodos
 
 function App() {
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    async function fetchTodos() {
+      try {
+        const result = await API.graphql(graphqlOperation(listTodos));
+        setTodos(result.data.listTodos.items);
+      } catch (err) {
+        console.error('Error fetching todos', err);
+      }
+    }
+    fetchTodos();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>Hello from V3</h1>
-      </header>
+    <div>
+      <h1>My Todos</h1>
+      <ul>
+        {todos.map(t => (
+          <li key={t.id}>{t.name}</li>
+        ))}
+      </ul>
     </div>
   );
 }
